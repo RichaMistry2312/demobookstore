@@ -1,0 +1,76 @@
+type Book
+  @model
+  @auth(
+    rules: [
+      { allow: groups, groups: ["Admin"] },
+      { allow: private, operations: [read] },
+      { allow: public, operations: [read] }
+    ]
+  ) {
+  id: ID! @primaryKey
+  title: String!
+  description: String
+  image: String
+  author: String
+  featured: Boolean
+  price: Float
+  orders: [BookOrder] @hasMany(indexName: "byBook", fields: ["id"])
+}
+
+type BookOrder
+  @model
+  @auth(
+    rules: [
+      { allow: owner, identityClaim: "email", ownerField: "customer" },
+      { allow: groups, groups: ["Admin"] }
+    ]
+  ) {
+  id: ID! @primaryKey
+  book_id: ID! @index(name: "byBook")
+  order_id: ID! @index(name: "byOrder")
+  
+  # Avoid circular reference by not including order directly here
+  book: Book @belongsTo(fields: ["book_id"])
+}
+
+type Order
+  @model
+  @auth(
+    rules: [
+      { allow: owner, identityClaim: "email", ownerField: "customer" },
+      { allow: groups, groups: ["Admin"] }
+    ]
+  ) {
+  id: ID! @primaryKey
+  user: String! @index(name: "byUser")
+  date: String
+  total: Float
+  books: [BookOrder] @hasMany(indexName: "byOrder", fields: ["id"])
+}
+
+enum OrderStatus {
+  SUCCESS
+  FAILED
+}
+
+input CartItem {
+  id: ID!
+  title: String
+  image: String
+  price: Float
+  amount: Int
+}
+
+input ProcessOrderInput {
+  id: ID!
+  cart: [CartItem]
+  total: Float!
+  token: String!
+  address: String
+}
+
+type Mutation {
+  processOrder(input: ProcessOrderInput!): OrderStatus
+    @function(name: "processPayment1-${env}")
+    @function(name: "createOrder1-${env}")
+}

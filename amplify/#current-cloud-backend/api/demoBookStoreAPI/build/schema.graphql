@@ -1,0 +1,428 @@
+type Book @aws_api_key @aws_cognito_user_pools {
+  id: ID!
+  title: String!
+  description: String
+  image: String
+  author: String
+  featured: Boolean
+  price: Float
+  orders(filter: ModelBookOrderFilterInput, sortDirection: ModelSortDirection, limit: Int, nextToken: String): ModelBookOrderConnection
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type BookOrder {
+  id: ID!
+  book_id: ID!
+  order_id: ID!
+  book: Book
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+  customer: String
+}
+
+type Order {
+  id: ID!
+  user: String!
+  date: String
+  total: Float
+  books(filter: ModelBookOrderFilterInput, sortDirection: ModelSortDirection, limit: Int, nextToken: String): ModelBookOrderConnection
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+  customer: String
+}
+
+enum OrderStatus {
+  SUCCESS
+  FAILED
+}
+
+input CartItem {
+  id: ID!
+  title: String
+  image: String
+  price: Float
+  amount: Int
+}
+
+input ProcessOrderInput {
+  id: ID!
+  cart: [CartItem]
+  total: Float!
+  token: String!
+  address: String
+}
+
+type Mutation {
+  processOrder(input: ProcessOrderInput!): OrderStatus
+  createBook(input: CreateBookInput!, condition: ModelBookConditionInput): Book
+  updateBook(input: UpdateBookInput!, condition: ModelBookConditionInput): Book
+  deleteBook(input: DeleteBookInput!, condition: ModelBookConditionInput): Book
+  createBookOrder(input: CreateBookOrderInput!, condition: ModelBookOrderConditionInput): BookOrder
+  updateBookOrder(input: UpdateBookOrderInput!, condition: ModelBookOrderConditionInput): BookOrder
+  deleteBookOrder(input: DeleteBookOrderInput!, condition: ModelBookOrderConditionInput): BookOrder
+  createOrder(input: CreateOrderInput!, condition: ModelOrderConditionInput): Order
+  updateOrder(input: UpdateOrderInput!, condition: ModelOrderConditionInput): Order
+  deleteOrder(input: DeleteOrderInput!, condition: ModelOrderConditionInput): Order
+}
+
+input ModelStringInput {
+  ne: String
+  eq: String
+  le: String
+  lt: String
+  ge: String
+  gt: String
+  contains: String
+  notContains: String
+  between: [String]
+  beginsWith: String
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+  size: ModelSizeInput
+}
+
+input ModelIntInput {
+  ne: Int
+  eq: Int
+  le: Int
+  lt: Int
+  ge: Int
+  gt: Int
+  between: [Int]
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelFloatInput {
+  ne: Float
+  eq: Float
+  le: Float
+  lt: Float
+  ge: Float
+  gt: Float
+  between: [Float]
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelBooleanInput {
+  ne: Boolean
+  eq: Boolean
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelIDInput {
+  ne: ID
+  eq: ID
+  le: ID
+  lt: ID
+  ge: ID
+  gt: ID
+  contains: ID
+  notContains: ID
+  between: [ID]
+  beginsWith: ID
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+  size: ModelSizeInput
+}
+
+input ModelSubscriptionStringInput {
+  ne: String
+  eq: String
+  le: String
+  lt: String
+  ge: String
+  gt: String
+  contains: String
+  notContains: String
+  between: [String]
+  beginsWith: String
+  in: [String]
+  notIn: [String]
+}
+
+input ModelSubscriptionIntInput {
+  ne: Int
+  eq: Int
+  le: Int
+  lt: Int
+  ge: Int
+  gt: Int
+  between: [Int]
+  in: [Int]
+  notIn: [Int]
+}
+
+input ModelSubscriptionFloatInput {
+  ne: Float
+  eq: Float
+  le: Float
+  lt: Float
+  ge: Float
+  gt: Float
+  between: [Float]
+  in: [Float]
+  notIn: [Float]
+}
+
+input ModelSubscriptionBooleanInput {
+  ne: Boolean
+  eq: Boolean
+}
+
+input ModelSubscriptionIDInput {
+  ne: ID
+  eq: ID
+  le: ID
+  lt: ID
+  ge: ID
+  gt: ID
+  contains: ID
+  notContains: ID
+  between: [ID]
+  beginsWith: ID
+  in: [ID]
+  notIn: [ID]
+}
+
+enum ModelAttributeTypes {
+  binary
+  binarySet
+  bool
+  list
+  map
+  number
+  numberSet
+  string
+  stringSet
+  _null
+}
+
+input ModelSizeInput {
+  ne: Int
+  eq: Int
+  le: Int
+  lt: Int
+  ge: Int
+  gt: Int
+  between: [Int]
+}
+
+enum ModelSortDirection {
+  ASC
+  DESC
+}
+
+type ModelBookConnection @aws_api_key @aws_cognito_user_pools {
+  items: [Book]!
+  nextToken: String
+}
+
+input ModelBookFilterInput {
+  id: ModelIDInput
+  title: ModelStringInput
+  description: ModelStringInput
+  image: ModelStringInput
+  author: ModelStringInput
+  featured: ModelBooleanInput
+  price: ModelFloatInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelBookFilterInput]
+  or: [ModelBookFilterInput]
+  not: ModelBookFilterInput
+}
+
+type Query {
+  getBookOrder(id: ID!): BookOrder
+  listBookOrders(id: ID, filter: ModelBookOrderFilterInput, limit: Int, nextToken: String, sortDirection: ModelSortDirection): ModelBookOrderConnection
+  getOrder(id: ID!): Order
+  listOrders(id: ID, filter: ModelOrderFilterInput, limit: Int, nextToken: String, sortDirection: ModelSortDirection): ModelOrderConnection
+  bookOrdersByBook_id(book_id: ID!, sortDirection: ModelSortDirection, filter: ModelBookOrderFilterInput, limit: Int, nextToken: String): ModelBookOrderConnection
+  bookOrdersByOrder_id(order_id: ID!, sortDirection: ModelSortDirection, filter: ModelBookOrderFilterInput, limit: Int, nextToken: String): ModelBookOrderConnection
+  ordersByUser(user: String!, sortDirection: ModelSortDirection, filter: ModelOrderFilterInput, limit: Int, nextToken: String): ModelOrderConnection
+  getBook(id: ID!): Book @aws_api_key @aws_cognito_user_pools
+  listBooks(id: ID, filter: ModelBookFilterInput, limit: Int, nextToken: String, sortDirection: ModelSortDirection): ModelBookConnection @aws_api_key @aws_cognito_user_pools
+}
+
+input ModelBookConditionInput {
+  title: ModelStringInput
+  description: ModelStringInput
+  image: ModelStringInput
+  author: ModelStringInput
+  featured: ModelBooleanInput
+  price: ModelFloatInput
+  and: [ModelBookConditionInput]
+  or: [ModelBookConditionInput]
+  not: ModelBookConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateBookInput {
+  id: ID
+  title: String!
+  description: String
+  image: String
+  author: String
+  featured: Boolean
+  price: Float
+}
+
+input UpdateBookInput {
+  id: ID!
+  title: String
+  description: String
+  image: String
+  author: String
+  featured: Boolean
+  price: Float
+}
+
+input DeleteBookInput {
+  id: ID!
+}
+
+input ModelSubscriptionBookFilterInput {
+  id: ModelSubscriptionIDInput
+  title: ModelSubscriptionStringInput
+  description: ModelSubscriptionStringInput
+  image: ModelSubscriptionStringInput
+  author: ModelSubscriptionStringInput
+  featured: ModelSubscriptionBooleanInput
+  price: ModelSubscriptionFloatInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionBookFilterInput]
+  or: [ModelSubscriptionBookFilterInput]
+}
+
+type Subscription {
+  onCreateBookOrder(filter: ModelSubscriptionBookOrderFilterInput, customer: String): BookOrder @aws_subscribe(mutations: ["createBookOrder"])
+  onUpdateBookOrder(filter: ModelSubscriptionBookOrderFilterInput, customer: String): BookOrder @aws_subscribe(mutations: ["updateBookOrder"])
+  onDeleteBookOrder(filter: ModelSubscriptionBookOrderFilterInput, customer: String): BookOrder @aws_subscribe(mutations: ["deleteBookOrder"])
+  onCreateOrder(filter: ModelSubscriptionOrderFilterInput, customer: String): Order @aws_subscribe(mutations: ["createOrder"])
+  onUpdateOrder(filter: ModelSubscriptionOrderFilterInput, customer: String): Order @aws_subscribe(mutations: ["updateOrder"])
+  onDeleteOrder(filter: ModelSubscriptionOrderFilterInput, customer: String): Order @aws_subscribe(mutations: ["deleteOrder"])
+  onCreateBook(filter: ModelSubscriptionBookFilterInput): Book @aws_subscribe(mutations: ["createBook"]) @aws_api_key @aws_cognito_user_pools
+  onUpdateBook(filter: ModelSubscriptionBookFilterInput): Book @aws_subscribe(mutations: ["updateBook"]) @aws_api_key @aws_cognito_user_pools
+  onDeleteBook(filter: ModelSubscriptionBookFilterInput): Book @aws_subscribe(mutations: ["deleteBook"]) @aws_api_key @aws_cognito_user_pools
+}
+
+type ModelBookOrderConnection @aws_api_key @aws_cognito_user_pools {
+  items: [BookOrder]!
+  nextToken: String
+}
+
+input ModelBookOrderFilterInput {
+  id: ModelIDInput
+  book_id: ModelIDInput
+  order_id: ModelIDInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelBookOrderFilterInput]
+  or: [ModelBookOrderFilterInput]
+  not: ModelBookOrderFilterInput
+  customer: ModelStringInput
+}
+
+input ModelBookOrderConditionInput {
+  book_id: ModelIDInput
+  order_id: ModelIDInput
+  and: [ModelBookOrderConditionInput]
+  or: [ModelBookOrderConditionInput]
+  not: ModelBookOrderConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  customer: ModelStringInput
+}
+
+input CreateBookOrderInput {
+  id: ID
+  book_id: ID!
+  order_id: ID!
+}
+
+input UpdateBookOrderInput {
+  id: ID!
+  book_id: ID
+  order_id: ID
+}
+
+input DeleteBookOrderInput {
+  id: ID!
+}
+
+input ModelSubscriptionBookOrderFilterInput {
+  id: ModelSubscriptionIDInput
+  book_id: ModelSubscriptionIDInput
+  order_id: ModelSubscriptionIDInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionBookOrderFilterInput]
+  or: [ModelSubscriptionBookOrderFilterInput]
+  customer: ModelStringInput
+}
+
+type ModelOrderConnection {
+  items: [Order]!
+  nextToken: String
+}
+
+input ModelOrderFilterInput {
+  id: ModelIDInput
+  user: ModelStringInput
+  date: ModelStringInput
+  total: ModelFloatInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelOrderFilterInput]
+  or: [ModelOrderFilterInput]
+  not: ModelOrderFilterInput
+  customer: ModelStringInput
+}
+
+input ModelOrderConditionInput {
+  user: ModelStringInput
+  date: ModelStringInput
+  total: ModelFloatInput
+  and: [ModelOrderConditionInput]
+  or: [ModelOrderConditionInput]
+  not: ModelOrderConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  customer: ModelStringInput
+}
+
+input CreateOrderInput {
+  id: ID
+  user: String!
+  date: String
+  total: Float
+}
+
+input UpdateOrderInput {
+  id: ID!
+  user: String
+  date: String
+  total: Float
+}
+
+input DeleteOrderInput {
+  id: ID!
+}
+
+input ModelSubscriptionOrderFilterInput {
+  id: ModelSubscriptionIDInput
+  user: ModelSubscriptionStringInput
+  date: ModelSubscriptionStringInput
+  total: ModelSubscriptionFloatInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionOrderFilterInput]
+  or: [ModelSubscriptionOrderFilterInput]
+  customer: ModelStringInput
+}
