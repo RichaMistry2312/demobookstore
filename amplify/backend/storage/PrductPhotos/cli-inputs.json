@@ -1,0 +1,16 @@
+{
+  "resourceName": "PrductPhotos",
+  "policyUUID": "85e47642",
+  "bucketName": "demobookstore1783f74bcd624afa9ba637c350947261",
+  "storageAccess": "authAndGuest",
+  "guestAccess": [
+    "READ"
+  ],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ],
+  "triggerFunction": "NONE",
+  "groupAccess": {}
+}

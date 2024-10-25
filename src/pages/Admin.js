@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { v4 as uuidv4 } from 'uuid';
-import { API, graphqlOperation, Storage } from "aws-amplify";
+import { API} from "@aws-amplify/api";
+import { Storage } from '@aws-amplify/storage';
+import { graphqlOperation } from 'aws-amplify';
 import { AmplifyAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
 import { createBook } from '../api/mutations'
 import config from '../aws-exports'
@@ -33,6 +35,8 @@ const Admin = () => {
         const name = file.name.split(".")[0];
         const key = `images/${uuidv4()}${name}.${extension}`;
         const url = `https://${bucket}.s3.${region}.amazonaws.com/public/${key}`
+        console.log(url)
+        console.log(key)
         try {
             // Upload the file to s3 with public access level. 
             await Storage.put(key, file, {
